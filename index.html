@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Clustering Analysis | K-Means Segmentation</title>
+    <meta name="description" content="Mall customer segmentation using K-Means clustering algorithm to enable targeted marketing strategies">
+    <style>
+        :root {
+            --primary: #0F1419;
+            --secondary: #1A1F2E;
+            --accent1: #00D9FF;
+            --accent2: #6C5CE7;
+            --accent3: #FF6B6B;
+            --text-primary: #FFFFFF;
+            --text-secondary: #A8B2D1;
+            --success: #00D084;
+            --warning: #FFB627;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 20, 25, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 217, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: var(--accent1);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent1);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(108, 92, 231, 0.1) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation: pulse 4s ease-in-out infinite 2s;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero h2 {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            font-weight: 400;
+            animation: fadeInUp 0.8s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem auto;
+            max-width: 900px;
+            animation: fadeInUp 0.8s ease 0.4s both;
+        }
+
+        .stat-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--accent1);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 3rem;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: var(--text-primary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.3);
+            animation: fadeInUp 0.8s ease 0.6s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 217, 255, 0.5);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 4rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* About Section */
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .about-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .about-card h3 {
+            color: var(--accent1);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .about-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .about-card ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .about-card li {
+            color: var(--text-secondary);
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .about-card li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent1);
+        }
+
+        /* Methodology Section */
+        .methodology-content {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 3rem;
+        }
+
+        .process-steps {
+            display: grid;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            flex-shrink: 0;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .step-content h3 {
+            color: var(--accent1);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        .code-snippet {
+            background: rgba(15, 20, 25, 0.8);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--accent1);
+        }
+
+        /* Results Section */
+        .clusters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .cluster-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cluster-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .cluster-card:nth-child(1)::before { background: var(--accent1); }
+        .cluster-card:nth-child(2)::before { background: var(--accent2); }
+        .cluster-card:nth-child(3)::before { background: var(--accent3); }
+        .cluster-card:nth-child(4)::before { background: var(--success); }
+
+        .cluster-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .cluster-id {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .cluster-card:nth-child(1) .cluster-id { color: var(--accent1); }
+        .cluster-card:nth-child(2) .cluster-id { color: var(--accent2); }
+        .cluster-card:nth-child(3) .cluster-id { color: var(--accent3); }
+        .cluster-card:nth-child(4) .cluster-id { color: var(--success); }
+
+        .cluster-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .cluster-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .cluster-characteristics {
+            background: rgba(15, 20, 25, 0.5);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .cluster-recommendation {
+            padding-top: 1rem;
+            border-top: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .cluster-recommendation strong {
+            color: var(--accent1);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .insights-section {
+            margin-top: 4rem;
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .insights-section h3 {
+            color: var(--accent1);
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .insight-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(15, 20, 25, 0.5);
+            border-left: 3px solid var(--accent1);
+            border-radius: 5px;
+            color: var(--text-secondary);
+        }
+
+        /* Code Section */
+        .code-container {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: rgba(15, 20, 25, 0.8);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .code-header h3 {
+            color: var(--accent1);
+        }
+
+        .copy-button {
+            padding: 0.5rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            border: none;
+            border-radius: 5px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .code-content {
+            padding: 2rem;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .code-content pre {
+            margin: 0;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-line {
+            display: block;
+            padding: 0.2rem 0;
+        }
+
+        .keyword { color: #FF79C6; }
+        .string { color: #50FA7B; }
+        .comment { color: #6272A4; font-style: italic; }
+        .function { color: var(--accent1); }
+        .variable { color: #FFB86C; }
+
+        /* Dataset Section */
+        .dataset-content {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .dataset-info {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .dataset-info h3 {
+            color: var(--accent1);
+            margin-bottom: 1rem;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .feature-tag {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid var(--accent1);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            text-align: center;
+            color: var(--accent1);
+            font-weight: 500;
+        }
+
+        .table-container {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        th {
+            background: rgba(15, 20, 25, 0.8);
+            color: var(--accent1);
+            font-weight: 600;
+        }
+
+        td {
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(15, 20, 25, 0.95);
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero h2 {
+                font-size: 1.2rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            section {
+                padding: 3rem 1rem;
+            }
+        }
+
+        /* Scroll Animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">CC Analysis</div>
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#about">About Me</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#code">Code</a></li>
+                <li><a href="#dataset">Dataset</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Customer Clustering Analysis</h1>
+            <h2>Segmenting Mall Customers using K-Means Algorithm</h2>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-number">200</div>
+                    <div class="stat-label">Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Clusters</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Features</div>
+                </div>
+            </div>
+            
+            <a href="#about" class="cta-button">Explore Analysis</a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <h2 class="section-title">About The Project</h2>
+        <p class="section-subtitle">Understanding customer behavior through data-driven segmentation</p>
+        
+        <div class="about-content fade-in">
+            <div class="about-card">
+                <h3>📊 Project Overview</h3>
+                <p>This project applies unsupervised machine learning techniques to segment mall customers into distinct groups based on their spending patterns and income levels, enabling targeted marketing strategies.</p>
+            </div>
+            
+            <div class="about-card">
+                <h3>💼 Business Context</h3>
+                <p>Customer clustering is crucial for businesses to understand their customer base, identify high-value segments, and develop personalized marketing strategies that maximize engagement and revenue.</p>
+            </div>
+            
+            <div class="about-card">
+                <h3>📁 Dataset Information</h3>
+                <p><strong>Total Records:</strong> 200 mall customers</p>
+                <ul>
+                    <li>CustomerID</li>
+                    <li>Gender</li>
+                    <li>Age</li>
+                    <li>Annual Income (k$)</li>
+                    <li>Spending Score (1-100)</li>
+                </ul>
+            </div>
+            
+            <div class="about-card">
+                <h3>🎯 Problem Statement</h3>
+                <p>How can we segment customers into meaningful groups based on their purchasing behavior and income levels to enable targeted marketing campaigns and improve customer retention?</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section id="methodology">
+        <h2 class="section-title">Methodology</h2>
+        <p class="section-subtitle">A systematic approach to customer segmentation</p>
+        
+        <div class="methodology-content fade-in">
+            <div class="process-steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Algorithm Selection</h3>
+                        <p><strong>K-Means Clustering</strong> was chosen for its efficiency in partitioning data into distinct, non-overlapping clusters based on feature similarity. It's ideal for customer segmentation due to its interpretability and scalability.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Feature Selection</h3>
+                        <p>Selected <strong>Annual Income (k$)</strong> and <strong>Spending Score (1-100)</strong> as primary features. These two dimensions provide clear insights into customer purchasing power and engagement levels.</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Data Preprocessing</h3>
+                        <p>Applied <strong>StandardScaler normalization</strong> to ensure both features contribute equally to the clustering process, preventing bias from different scales.</p>
+                        <div class="code-snippet">
+                            scaler = StandardScaler()<br>
+                            X_scaled = scaler.fit_transform(X)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>Optimal Cluster Selection</h3>
+                        <p>Used the <strong>Elbow Method</strong> to determine the optimal number of clusters. Analysis revealed k=4 as the sweet spot, balancing model complexity and cluster distinctiveness.</p>
+                        <div class="code-snippet">
+                            wcss = []<br>
+                            for i in range(1, 11):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans = KMeans(n_clusters=i)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans.fit(X_scaled)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;wcss.append(kmeans.inertia_)
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Cluster Interpretation</h3>
+                        <p>Each cluster was analyzed based on centroid positions and member characteristics to derive actionable business insights and marketing recommendations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="results">
+        <h2 class="section-title">Results &amp; Insights</h2>
+        <p class="section-subtitle">Four distinct customer segments identified</p>
+        
+        <div class="clusters-grid fade-in">
+            <div class="cluster-card">
+                <div class="cluster-id">Cluster 0</div>
+                <div class="cluster-name">Premium Customers</div>
+                <div class="cluster-description">High income, high spenders</div>
+                <div class="cluster-characteristics">
+                    <strong>Characteristics:</strong><br>
+                    Affluent customers with high purchasing power and willingness to spend
+                </div>
+                <div class="cluster-recommendation">
+                    <strong>Recommendation:</strong><br>
+                    Premium products, loyalty programs, exclusive offers
+                </div>
+            </div>
+            
+            <div class="cluster-card">
+                <div class="cluster-id">Cluster 1</div>
+                <div class="cluster-name">Potential Upsell</div>
+                <div class="cluster-description">High income, low spenders</div>
+                <div class="cluster-characteristics">
+                    <strong>Characteristics:</strong><br>
+                    Wealthy customers with low engagement and spending
+                </div>
+                <div class="cluster-recommendation">
+                    <strong>Recommendation:</strong><br>
+                    Targeted promotions, personalized marketing, bundled deals
+                </div>
+            </div>
+            
+            <div class="cluster-card">
+                <div class="cluster-id">Cluster 2</div>
+                <div class="cluster-name">Value Buyers</div>
+                <div class="cluster-description">Low income, high spenders</div>
+                <div class="cluster-characteristics">
+                    <strong>Characteristics:</strong><br>
+                    Budget-conscious but highly engaged customers
+                </div>
+                <div class="cluster-recommendation">
+                    <strong>Recommendation:</strong><br>
+                    Value products, frequent promotions, bulk discounts
+                </div>
+            </div>
+            
+            <div class="cluster-card">
+                <div class="cluster-id">Cluster 3</div>
+                <div class="cluster-name">Budget-Conscious</div>
+                <div class="cluster-description">Low income, low spenders</div>
+                <div class="cluster-characteristics">
+                    <strong>Characteristics:</strong><br>
+                    Price-sensitive customers with minimal spending
+                </div>
+                <div class="cluster-recommendation">
+                    <strong>Recommendation:</strong><br>
+                    Entry-level products, seasonal sales, referral programs
+                </div>
+            </div>
+        </div>
+        
+        <div class="insights-section fade-in">
+            <h3>Key Insights</h3>
+            <div class="insight-item">
+                ✓ Distinct customer segments exist with different spending behaviors
+            </div>
+            <div class="insight-item">
+                ✓ Income and spending score are moderately correlated
+            </div>
+            <div class="insight-item">
+                ✓ Multiple marketing strategies needed for diverse customer base
+            </div>
+            <div class="insight-item">
+                ✓ Targeted campaigns can improve customer engagement and revenue
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Section -->
+    <section id="code">
+        <h2 class="section-title">Implementation Code</h2>
+        <p class="section-subtitle">Python implementation of the clustering analysis</p>
+        
+        <div class="code-container fade-in">
+            <div class="code-header">
+                <h3>clustering_analysis.py</h3>
+                <button class="copy-button" onclick="copyCode()">Copy Code</button>
+            </div>
+            <div class="code-content">
+                <pre id="codeBlock"><span class="comment"># Import necessary libraries</span>
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> seaborn <span class="keyword">as</span> sns
+<span class="keyword">from</span> sklearn.cluster <span class="keyword">import</span> KMeans
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler
+
+<span class="comment"># Load the dataset</span>
+df = pd.<span class="function">read_csv</span>(<span class="string">'Mall_Customers.csv'</span>)
+
+<span class="comment"># Display basic information</span>
+<span class="function">print</span>(df.<span class="function">head</span>())
+<span class="function">print</span>(df.<span class="function">info</span>())
+<span class="function">print</span>(df.<span class="function">describe</span>())
+
+<span class="comment"># Select features for clustering</span>
+X = df[[<span class="string">'Annual Income (k$)'</span>, <span class="string">'Spending Score (1-100)'</span>]]
+
+<span class="comment"># Normalize the features</span>
+scaler = <span class="function">StandardScaler</span>()
+X_scaled = scaler.<span class="function">fit_transform</span>(X)
+
+<span class="comment"># Determine optimal number of clusters using Elbow Method</span>
+wcss = []
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">1</span>, <span class="variable">11</span>):
+    kmeans = <span class="function">KMeans</span>(n_clusters=i, random_state=<span class="variable">42</span>)
+    kmeans.<span class="function">fit</span>(X_scaled)
+    wcss.<span class="function">append</span>(kmeans.inertia_)
+
+<span class="comment"># Plot the Elbow curve</span>
+plt.<span class="function">figure</span>(figsize=(<span class="variable">10</span>, <span class="variable">6</span>))
+plt.<span class="function">plot</span>(<span class="function">range</span>(<span class="variable">1</span>, <span class="variable">11</span>), wcss, marker=<span class="string">'o'</span>)
+plt.<span class="function">title</span>(<span class="string">'Elbow Method'</span>)
+plt.<span class="function">xlabel</span>(<span class="string">'Number of Clusters'</span>)
+plt.<span class="function">ylabel</span>(<span class="string">'WCSS'</span>)
+plt.<span class="function">show</span>()
+
+<span class="comment"># Apply K-Means with optimal clusters (k=4)</span>
+kmeans = <span class="function">KMeans</span>(n_clusters=<span class="variable">4</span>, random_state=<span class="variable">42</span>)
+y_kmeans = kmeans.<span class="function">fit_predict</span>(X_scaled)
+
+<span class="comment"># Add cluster labels to dataframe</span>
+df[<span class="string">'Cluster'</span>] = y_kmeans
+
+<span class="comment"># Visualize the clusters</span>
+plt.<span class="function">figure</span>(figsize=(<span class="variable">12</span>, <span class="variable">8</span>))
+colors = [<span class="string">'#00D9FF'</span>, <span class="string">'#6C5CE7'</span>, <span class="string">'#FF6B6B'</span>, <span class="string">'#00D084'</span>]
+
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">4</span>):
+    plt.<span class="function">scatter</span>(
+        X[y_kmeans == i].iloc[:, <span class="variable">0</span>],
+        X[y_kmeans == i].iloc[:, <span class="variable">1</span>],
+        s=<span class="variable">100</span>, c=colors[i], label=<span class="string">f'Cluster {i}'</span>, alpha=<span class="variable">0.7</span>
+    )
+
+<span class="comment"># Plot cluster centers</span>
+centers = scaler.<span class="function">inverse_transform</span>(kmeans.cluster_centers_)
+plt.<span class="function">scatter</span>(
+    centers[:, <span class="variable">0</span>], centers[:, <span class="variable">1</span>],
+    s=<span class="variable">300</span>, c=<span class="string">'black'</span>, marker=<span class="string">'*'</span>, label=<span class="string">'Centroids'</span>
+)
+
+plt.<span class="function">title</span>(<span class="string">'Customer Segments'</span>, fontsize=<span class="variable">16</span>)
+plt.<span class="function">xlabel</span>(<span class="string">'Annual Income (k$)'</span>, fontsize=<span class="variable">12</span>)
+plt.<span class="function">ylabel</span>(<span class="string">'Spending Score (1-100)'</span>, fontsize=<span class="variable">12</span>)
+plt.<span class="function">legend</span>()
+plt.<span class="function">show</span>()
+
+<span class="comment"># Analyze cluster characteristics</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">4</span>):
+    <span class="function">print</span>(<span class="string">f'\nCluster {i}:'</span>)
+    <span class="function">print</span>(df[df[<span class="string">'Cluster'</span>] == i][[<span class="string">'Annual Income (k$)'</span>, <span class="string">'Spending Score (1-100)'</span>]].<span class="function">describe</span>())</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dataset Section -->
+    <section id="dataset">
+        <h2 class="section-title">Dataset</h2>
+        <p class="section-subtitle">Mall customer information used for analysis</p>
+        
+        <div class="dataset-content fade-in">
+            <div class="dataset-info">
+                <h3>Dataset Description</h3>
+                <p>The dataset contains information about 200 mall customers, including demographic and behavioral features that are crucial for customer segmentation analysis.</p>
+                
+                <h3 style="margin-top: 2rem;">Features</h3>
+                <div class="features-list">
+                    <div class="feature-tag">CustomerID</div>
+                    <div class="feature-tag">Gender</div>
+                    <div class="feature-tag">Age</div>
+                    <div class="feature-tag">Annual Income (k$)</div>
+                    <div class="feature-tag">Spending Score (1-100)</div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 style="color: var(--accent1); margin-bottom: 1.5rem;">Sample Data Preview</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CustomerID</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Annual Income (k$)</th>
+                            <th>Spending Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0001</td>
+                            <td>Male</td>
+                            <td>19</td>
+                            <td>15</td>
+                            <td>39</td>
+                        </tr>
+                        <tr>
+                            <td>0002</td>
+                            <td>Male</td>
+                            <td>21</td>
+                            <td>15</td>
+                            <td>81</td>
+                        </tr>
+                        <tr>
+                            <td>0003</td>
+                            <td>Female</td>
+                            <td>20</td>
+                            <td>16</td>
+                            <td>6</td>
+                        </tr>
+                        <tr>
+                            <td>0004</td>
+                            <td>Female</td>
+                            <td>23</td>
+                            <td>16</td>
+                            <td>77</td>
+                        </tr>
+                        <tr>
+                            <td>0005</td>
+                            <td>Female</td>
+                            <td>31</td>
+                            <td>17</td>
+                            <td>40</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 Customer Clustering Analysis Project. Built with passion for data science and machine learning.</p>
+    </footer>
+
+    <script>
+        // Navigation active state
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Scroll animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Copy code function
+        function copyCode() {
+            const codeBlock = document.getElementById('codeBlock');
+            const text = codeBlock.innerText;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const button = document.querySelector('.copy-button');
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = 'linear-gradient(135deg, var(--success), var(--accent1))';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'linear-gradient(135deg, var(--accent1), var(--accent2))';
+                }, 2000);
+            });
+        }
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
