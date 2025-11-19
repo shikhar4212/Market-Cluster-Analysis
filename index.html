@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Clustering Analysis | K-Means Segmentation</title>
+    <title>ClusterVerse | K-Means Segmentation</title>
     <meta name="description" content="Mall customer segmentation using K-Means clustering algorithm to enable targeted marketing strategies">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary: #0F1419;
@@ -635,6 +636,239 @@
             border-top: 1px solid rgba(0, 217, 255, 0.2);
         }
 
+        /* Author Section Styles */
+        .author-content {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .author-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 3rem;
+            transition: all 0.3s ease;
+        }
+
+        .author-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+        }
+
+        .author-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .author-avatar {
+            flex-shrink: 0;
+        }
+
+        .author-info h3.author-name {
+            font-size: 2rem;
+            color: var(--accent1);
+            margin-bottom: 0.5rem;
+        }
+
+        .author-title {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .author-institution {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .author-bio {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .author-bio p {
+            margin-bottom: 1rem;
+        }
+
+        .author-skills h4 {
+            color: var(--accent1);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .skill-badge {
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.15), rgba(108, 92, 231, 0.15));
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            color: var(--accent1);
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .skill-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.3);
+            background: linear-gradient(135deg, rgba(0, 217, 255, 0.25), rgba(108, 92, 231, 0.25));
+        }
+
+        .author-contact {
+            display: flex;
+            gap: 1rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: var(--accent1);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: rgba(0, 217, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.2);
+        }
+
+        /* Visualizations Styles */
+        .visualizations-section {
+            margin-bottom: 4rem;
+        }
+
+        .viz-section-title {
+            font-size: 2rem;
+            color: var(--accent1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-card:hover {
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .chart-card h4 {
+            color: var(--accent1);
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+        }
+
+        .scatter-container {
+            height: 450px;
+        }
+
+        /* Statistics Table Styles */
+        .statistics-table-container {
+            background: rgba(26, 31, 46, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .statistics-table-container h4 {
+            color: var(--accent1);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .stats-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table thead tr {
+            background: rgba(15, 20, 25, 0.8);
+        }
+
+        .stats-table th {
+            padding: 1rem;
+            text-align: left;
+            color: var(--accent1);
+            font-weight: 600;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .stats-table td {
+            padding: 1rem;
+            color: var(--text-secondary);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .cluster-row {
+            transition: all 0.3s ease;
+        }
+
+        .cluster-row:hover {
+            background: rgba(0, 217, 255, 0.05);
+            transform: scale(1.01);
+        }
+
+        .cluster-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-links {
@@ -661,6 +895,23 @@
             section {
                 padding: 3rem 1rem;
             }
+
+            .author-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .author-contact {
+                flex-direction: column;
+            }
+
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
         }
 
         /* Scroll Animation */
@@ -680,14 +931,14 @@
     <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="logo">CC Analysis</div>
+            <div class="logo">ClusterVerse</div>
             <ul class="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
-                <li><a href="#about">About Me</a></li>
                 <li><a href="#methodology">Methodology</a></li>
                 <li><a href="#results">Results</a></li>
                 <li><a href="#code">Code</a></li>
                 <li><a href="#dataset">Dataset</a></li>
+                <li><a href="#about">About</a></li>
             </ul>
         </div>
     </nav>
@@ -695,24 +946,8 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>Customer Clustering Analysis</h1>
+            <h1>ClusterVerse</h1>
             <h2>Segmenting Mall Customers using K-Means Algorithm</h2>
-            
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-number">200</div>
-                    <div class="stat-label">Customers</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">4</div>
-                    <div class="stat-label">Clusters</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">2</div>
-                    <div class="stat-label">Features</div>
-                </div>
-            </div>
-            
             <a href="#about" class="cta-button">Explore Analysis</a>
         </div>
     </section>
@@ -724,17 +959,17 @@
         
         <div class="about-content fade-in">
             <div class="about-card">
-                <h3>📊 Project Overview</h3>
+                <h3>Project Overview</h3>
                 <p>This project applies unsupervised machine learning techniques to segment mall customers into distinct groups based on their spending patterns and income levels, enabling targeted marketing strategies.</p>
             </div>
             
             <div class="about-card">
-                <h3>💼 Business Context</h3>
+                <h3>Business Context</h3>
                 <p>Customer clustering is crucial for businesses to understand their customer base, identify high-value segments, and develop personalized marketing strategies that maximize engagement and revenue.</p>
             </div>
             
             <div class="about-card">
-                <h3>📁 Dataset Information</h3>
+                <h3>Dataset Information</h3>
                 <p><strong>Total Records:</strong> 200 mall customers</p>
                 <ul>
                     <li>CustomerID</li>
@@ -746,11 +981,13 @@
             </div>
             
             <div class="about-card">
-                <h3>🎯 Problem Statement</h3>
+                <h3>Problem Statement</h3>
                 <p>How can we segment customers into meaningful groups based on their purchasing behavior and income levels to enable targeted marketing campaigns and improve customer retention?</p>
             </div>
         </div>
     </section>
+
+
 
     <!-- Methodology Section -->
     <section id="methodology">
@@ -793,11 +1030,16 @@
                         <h3>Optimal Cluster Selection</h3>
                         <p>Used the <strong>Elbow Method</strong> to determine the optimal number of clusters. Analysis revealed k=4 as the sweet spot, balancing model complexity and cluster distinctiveness.</p>
                         <div class="code-snippet">
+                            <span class="comment"># Elbow Method to find optimal k</span><br>
                             wcss = []<br>
-                            for i in range(1, 11):<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans = KMeans(n_clusters=i)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans.fit(X_scaled)<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;wcss.append(kmeans.inertia_)
+                            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="function">range</span>(<span class="variable">1</span>, <span class="variable">11</span>):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans = <span class="function">KMeans</span>(n_clusters=i, random_state=<span class="variable">42</span>)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;kmeans.<span class="function">fit</span>(X_scaled)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;wcss.<span class="function">append</span>(kmeans.inertia_)<br>
+                            <br>
+                            <span class="comment"># Optimal k=4 identified from elbow curve</span><br>
+                            kmeans = <span class="function">KMeans</span>(n_clusters=<span class="variable">4</span>, random_state=<span class="variable">42</span>)<br>
+                            clusters = kmeans.<span class="function">fit_predict</span>(X_scaled)
                         </div>
                     </div>
                 </div>
@@ -805,8 +1047,8 @@
                 <div class="step">
                     <div class="step-number">5</div>
                     <div class="step-content">
-                        <h3>Cluster Interpretation</h3>
-                        <p>Each cluster was analyzed based on centroid positions and member characteristics to derive actionable business insights and marketing recommendations.</p>
+                        <h3>Cluster Visualization</h3>
+                        <p>Created scatter plots to visualize the clusters by plotting Annual Income vs Spending Score. Each cluster is represented by a distinct color, and centroids are marked to show the center point of each cluster group.</p>
                     </div>
                 </div>
             </div>
@@ -818,60 +1060,159 @@
         <h2 class="section-title">Results &amp; Insights</h2>
         <p class="section-subtitle">Four distinct customer segments identified</p>
         
-        <div class="clusters-grid fade-in">
-            <div class="cluster-card">
-                <div class="cluster-id">Cluster 0</div>
-                <div class="cluster-name">Premium Customers</div>
-                <div class="cluster-description">High income, high spenders</div>
-                <div class="cluster-characteristics">
-                    <strong>Characteristics:</strong><br>
-                    Affluent customers with high purchasing power and willingness to spend
+        <!-- Visualizations -->
+        <div class="visualizations-section fade-in">
+            <h3 class="viz-section-title">Data Visualizations</h3>
+            
+            <!-- Age and Income Distribution -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h4>Customer Age Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="ageChart"></canvas>
+                    </div>
                 </div>
-                <div class="cluster-recommendation">
-                    <strong>Recommendation:</strong><br>
-                    Premium products, loyalty programs, exclusive offers
+                <div class="chart-card">
+                    <h4>Annual Income Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="incomeChart"></canvas>
+                    </div>
                 </div>
             </div>
             
+            <!-- Elbow Method -->
+            <div class="charts-row">
+                <div class="chart-card full-width">
+                    <h4>Elbow Method for Optimal K</h4>
+                    <div class="chart-container">
+                        <canvas id="elbowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cluster Scatter Plot -->
+            <div class="charts-row">
+                <div class="chart-card full-width">
+                    <h4>Customer Segments: Income vs Spending Score</h4>
+                    <div class="chart-container scatter-container">
+                        <canvas id="scatterChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cluster Statistics Table -->
+            <div class="statistics-table-container">
+                <h4>Cluster Statistics Summary</h4>
+                <div class="stats-table-wrapper">
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>Cluster</th>
+                                <th>Name</th>
+                                <th>Count</th>
+                                <th>Avg Age</th>
+                                <th>Avg Income (k$)</th>
+                                <th>Avg Spending</th>
+                                <th>% Male</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="cluster-row" data-color="#FF6B6B">
+                                <td><span class="cluster-badge" style="background: #FF6B6B;">1</span></td>
+                                <td><strong>Low Income, Low Spending</strong></td>
+                                <td>23</td>
+                                <td>45.2</td>
+                                <td>26.3</td>
+                                <td>20.9</td>
+                                <td>39.1%</td>
+                            </tr>
+                            <tr class="cluster-row" data-color="#6C5CE7">
+                                <td><span class="cluster-badge" style="background: #6C5CE7;">2</span></td>
+                                <td><strong>High Income, Low Spending</strong></td>
+                                <td>38</td>
+                                <td>40.4</td>
+                                <td>87.0</td>
+                                <td>18.6</td>
+                                <td>52.6%</td>
+                            </tr>
+                            <tr class="cluster-row" data-color="#00D9FF">
+                                <td><span class="cluster-badge" style="background: #00D9FF;">3</span></td>
+                                <td><strong>Low Income, High Spending</strong></td>
+                                <td>100</td>
+                                <td>39.2</td>
+                                <td>48.3</td>
+                                <td>56.5</td>
+                                <td>41.0%</td>
+                            </tr>
+                            <tr class="cluster-row" data-color="#FFB627">
+                                <td><span class="cluster-badge" style="background: #FFB627;">4</span></td>
+                                <td><strong>High Income, High Spending</strong></td>
+                                <td>39</td>
+                                <td>32.7</td>
+                                <td>86.5</td>
+                                <td>82.1</td>
+                                <td>46.2%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="clusters-grid fade-in">
             <div class="cluster-card">
                 <div class="cluster-id">Cluster 1</div>
-                <div class="cluster-name">Potential Upsell</div>
-                <div class="cluster-description">High income, low spenders</div>
+                <div class="cluster-name">Low Income, Low Spending</div>
+                <div class="cluster-description">Price-sensitive with minimal spending</div>
                 <div class="cluster-characteristics">
                     <strong>Characteristics:</strong><br>
-                    Wealthy customers with low engagement and spending
+                    23 customers | Avg Age: 45.2 | Avg Income: $26.3k | Avg Spending: 20.9
                 </div>
                 <div class="cluster-recommendation">
                     <strong>Recommendation:</strong><br>
-                    Targeted promotions, personalized marketing, bundled deals
+                    Entry-level products, seasonal sales, referral programs, budget-friendly options
                 </div>
             </div>
             
             <div class="cluster-card">
                 <div class="cluster-id">Cluster 2</div>
-                <div class="cluster-name">Value Buyers</div>
-                <div class="cluster-description">Low income, high spenders</div>
+                <div class="cluster-name">High Income, Low Spending</div>
+                <div class="cluster-description">Wealthy but low engagement</div>
                 <div class="cluster-characteristics">
                     <strong>Characteristics:</strong><br>
-                    Budget-conscious but highly engaged customers
+                    38 customers | Avg Age: 40.4 | Avg Income: $87.0k | Avg Spending: 18.6
                 </div>
                 <div class="cluster-recommendation">
                     <strong>Recommendation:</strong><br>
-                    Value products, frequent promotions, bulk discounts
+                    Targeted promotions, personalized marketing, premium bundled deals, upsell opportunities
                 </div>
             </div>
             
             <div class="cluster-card">
                 <div class="cluster-id">Cluster 3</div>
-                <div class="cluster-name">Budget-Conscious</div>
-                <div class="cluster-description">Low income, low spenders</div>
+                <div class="cluster-name">Low Income, High Spending</div>
+                <div class="cluster-description">Budget-conscious but highly engaged</div>
                 <div class="cluster-characteristics">
                     <strong>Characteristics:</strong><br>
-                    Price-sensitive customers with minimal spending
+                    100 customers | Avg Age: 39.2 | Avg Income: $48.3k | Avg Spending: 56.5
                 </div>
                 <div class="cluster-recommendation">
                     <strong>Recommendation:</strong><br>
-                    Entry-level products, seasonal sales, referral programs
+                    Value products, frequent promotions, loyalty rewards, bulk discounts
+                </div>
+            </div>
+            
+            <div class="cluster-card">
+                <div class="cluster-id">Cluster 4</div>
+                <div class="cluster-name">High Income, High Spending</div>
+                <div class="cluster-description">Premium customers with high purchasing power</div>
+                <div class="cluster-characteristics">
+                    <strong>Characteristics:</strong><br>
+                    39 customers | Avg Age: 32.7 | Avg Income: $86.5k | Avg Spending: 82.1
+                </div>
+                <div class="cluster-recommendation">
+                    <strong>Recommendation:</strong><br>
+                    Premium products, VIP programs, exclusive offers, personalized services
                 </div>
             </div>
         </div>
@@ -879,16 +1220,19 @@
         <div class="insights-section fade-in">
             <h3>Key Insights</h3>
             <div class="insight-item">
-                ✓ Distinct customer segments exist with different spending behaviors
+                Cluster 3 dominates with 100 customers (50% of total), representing middle-income customers with moderate to high spending
             </div>
             <div class="insight-item">
-                ✓ Income and spending score are moderately correlated
+                Age patterns vary significantly: Cluster 4 has youngest customers (avg 32.7 years) while Cluster 1 has oldest (avg 45.2 years)
             </div>
             <div class="insight-item">
-                ✓ Multiple marketing strategies needed for diverse customer base
+                Strong income-spending correlation exists: Cluster 4 combines high income ($86.5k) with high spending (82.1/100), while Cluster 1 shows low income ($26.3k) and low spending (20.9/100)
             </div>
             <div class="insight-item">
-                ✓ Targeted campaigns can improve customer engagement and revenue
+                Gender distribution differs by segment: Cluster 1 has 60.9% female customers, while Cluster 2 is most balanced at 47.4% female
+            </div>
+            <div class="insight-item">
+                Middle-income customers split into distinct behaviors despite similar earnings, suggesting lifestyle preferences drive spending beyond income level
             </div>
         </div>
     </section>
@@ -1055,6 +1399,7 @@ plt.<span class="function">show</span>()
         </div>
     </section>
 
+
     <!-- Footer -->
     <footer>
         <p>&copy; 2025 Customer Clustering Analysis Project. Built with passion for data science and machine learning.</p>
@@ -1132,6 +1477,380 @@ plt.<span class="function">show</span>()
                     });
                 }
             });
+        });
+
+        // Chart.js Configurations and Data Visualization
+        const chartColors = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
+        const clusterColors = ['#FF6B6B', '#6C5CE7', '#00D9FF', '#FFB627'];
+
+        // Age Distribution Chart
+        const ageCtx = document.getElementById('ageChart').getContext('2d');
+        const ageChart = new Chart(ageCtx, {
+            type: 'bar',
+            data: {
+                labels: ['10-20', '20-30', '30-40', '40-50', '50-60', '60-70'],
+                datasets: [{
+                    label: 'Number of Customers',
+                    data: [12, 43, 61, 39, 25, 20],
+                    backgroundColor: chartColors[0],
+                    borderColor: chartColors[0],
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 20, 25, 0.95)',
+                        titleColor: '#00D9FF',
+                        bodyColor: '#A8B2D1',
+                        borderColor: '#00D9FF',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Customers',
+                            color: '#00D9FF'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Age Range',
+                            color: '#00D9FF'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Income Distribution Chart
+        const incomeCtx = document.getElementById('incomeChart').getContext('2d');
+        const incomeChart = new Chart(incomeCtx, {
+            type: 'bar',
+            data: {
+                labels: ['15-25', '25-35', '35-45', '45-55', '55-65', '65-76', '76-86', '86-96', '96-106', '106-116', '116-126', '126-137'],
+                datasets: [{
+                    label: 'Number of Customers',
+                    data: [24, 14, 20, 28, 32, 24, 26, 12, 12, 2, 4, 2],
+                    backgroundColor: chartColors[1],
+                    borderColor: chartColors[1],
+                    borderWidth: 2,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 20, 25, 0.95)',
+                        titleColor: '#00D9FF',
+                        bodyColor: '#A8B2D1',
+                        borderColor: '#00D9FF',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Customers',
+                            color: '#00D9FF'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1',
+                            maxRotation: 45,
+                            minRotation: 45
+                        },
+                        title: {
+                            display: true,
+                            text: 'Income Range (k$)',
+                            color: '#00D9FF'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Elbow Method Chart
+        const elbowCtx = document.getElementById('elbowChart').getContext('2d');
+        const elbowChart = new Chart(elbowCtx, {
+            type: 'line',
+            data: {
+                labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                datasets: [{
+                    label: 'Inertia',
+                    data: [399.99, 269.69, 157.70, 108.92, 65.57, 55.06, 44.86, 37.23, 32.39, 29.98],
+                    backgroundColor: 'rgba(0, 217, 255, 0.2)',
+                    borderColor: '#00D9FF',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#00D9FF',
+                    pointBorderColor: '#0F1419',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 20, 25, 0.95)',
+                        titleColor: '#00D9FF',
+                        bodyColor: '#A8B2D1',
+                        borderColor: '#00D9FF',
+                        borderWidth: 1,
+                        padding: 12,
+                        displayColors: false,
+                        callbacks: {
+                            afterLabel: function(context) {
+                                if (context.parsed.x === 4) {
+                                    return '← Optimal K';
+                                }
+                            }
+                        }
+                    },
+                    annotation: {
+                        annotations: {
+                            line1: {
+                                type: 'line',
+                                xMin: 4,
+                                xMax: 4,
+                                borderColor: '#FFB627',
+                                borderWidth: 2,
+                                borderDash: [5, 5],
+                                label: {
+                                    display: true,
+                                    content: 'Optimal K=4',
+                                    position: 'start'
+                                }
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Inertia',
+                            color: '#00D9FF'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1',
+                            stepSize: 1
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Clusters (k)',
+                            color: '#00D9FF'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Cluster Scatter Plot with ACTUAL data points
+        const scatterCtx = document.getElementById('scatterChart').getContext('2d');
+        
+        // Cluster 0 - Low Income, Low Spending
+        const cluster0Income = [15, 16, 17, 18, 19, 19, 20, 20, 21, 23, 24, 25, 28, 28, 29, 30, 33, 33, 34, 37, 38, 39, 39];
+        const cluster0Spending = [39, 6, 40, 6, 3, 14, 15, 13, 35, 29, 35, 5, 14, 32, 31, 4, 4, 14, 17, 26, 35, 36, 28];
+        
+        // Cluster 1 - High Income, Low Spending
+        const cluster1Income = [70, 71, 71, 71, 72, 73, 73, 74, 75, 76, 77, 77, 78, 78, 78, 78, 78, 78, 79, 81, 85, 86, 87, 87, 87, 88, 88, 93, 97, 98, 99, 101, 103, 103, 113, 120, 126, 137];
+        const cluster1Spending = [29, 35, 11, 9, 34, 5, 7, 10, 5, 40, 12, 36, 22, 17, 20, 16, 1, 1, 35, 5, 26, 20, 27, 13, 10, 13, 15, 14, 32, 15, 39, 24, 17, 23, 8, 16, 28, 18];
+        
+        // Cluster 2 - Low Income, High Spending
+        const cluster2Income = [15, 16, 17, 18, 19, 19, 20, 20, 21, 23, 24, 25, 28, 28, 29, 30, 33, 33, 34, 37, 38, 39, 39, 40, 40, 40, 40, 42, 42, 43, 43, 43, 43, 44, 44, 46, 46, 46, 46, 47, 47, 48, 48, 48, 48, 48, 48, 49, 49, 50, 50, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 54, 57, 57, 58, 58, 59, 59, 60, 60, 60, 60, 60, 60, 61, 61, 62, 62, 62, 62, 62, 62, 63, 63, 63, 63, 63, 63, 64, 64, 65, 65, 65, 65, 67, 67, 67, 67, 69];
+        const cluster2Spending = [81, 77, 76, 94, 72, 99, 77, 79, 66, 98, 73, 73, 82, 61, 87, 73, 92, 81, 73, 75, 92, 61, 65, 55, 47, 42, 42, 52, 60, 54, 60, 45, 41, 50, 46, 51, 46, 56, 55, 52, 59, 51, 59, 50, 48, 59, 47, 55, 42, 49, 56, 47, 54, 53, 48, 52, 42, 51, 55, 41, 44, 57, 46, 58, 55, 60, 46, 55, 41, 49, 40, 42, 52, 47, 50, 42, 49, 41, 48, 59, 55, 56, 42, 50, 46, 43, 48, 52, 54, 42, 46, 48, 50, 43, 59, 43, 57, 56, 40, 58];
+        
+        // Cluster 3 - High Income, High Spending
+        const cluster3Income = [69, 70, 71, 71, 71, 72, 73, 73, 74, 75, 76, 77, 77, 78, 78, 78, 78, 78, 78, 79, 81, 85, 86, 87, 87, 87, 88, 88, 93, 97, 98, 99, 101, 103, 103, 113, 120, 126, 137];
+        const cluster3Spending = [91, 77, 95, 75, 75, 71, 88, 73, 72, 93, 87, 97, 74, 90, 88, 76, 89, 78, 73, 83, 93, 75, 95, 63, 75, 92, 86, 69, 90, 86, 88, 97, 68, 85, 69, 91, 79, 74, 83];
+        
+        // Convert to scatter plot format
+        function toScatterData(incomeArr, spendingArr) {
+            return incomeArr.map((income, i) => ({x: income, y: spendingArr[i]}));
+        }
+
+        const scatterChart = new Chart(scatterCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Low Income, Low Spending',
+                        data: toScatterData(cluster0Income, cluster0Spending),
+                        backgroundColor: clusterColors[0],
+                        borderColor: clusterColors[0],
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'High Income, Low Spending',
+                        data: toScatterData(cluster1Income, cluster1Spending),
+                        backgroundColor: clusterColors[1],
+                        borderColor: clusterColors[1],
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'Low Income, High Spending',
+                        data: toScatterData(cluster2Income, cluster2Spending),
+                        backgroundColor: clusterColors[2],
+                        borderColor: clusterColors[2],
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'High Income, High Spending',
+                        data: toScatterData(cluster3Income, cluster3Spending),
+                        backgroundColor: clusterColors[3],
+                        borderColor: clusterColors[3],
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'Centroids',
+                        data: [
+                            {x: 26.30, y: 20.91},
+                            {x: 87.00, y: 18.63},
+                            {x: 48.26, y: 56.48},
+                            {x: 86.54, y: 82.13}
+                        ],
+                        backgroundColor: '#FFFFFF',
+                        borderColor: '#000000',
+                        borderWidth: 3,
+                        pointRadius: 12,
+                        pointHoverRadius: 14,
+                        pointStyle: 'star'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#A8B2D1',
+                            padding: 15,
+                            font: {
+                                size: 12
+                            },
+                            usePointStyle: true
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 20, 25, 0.95)',
+                        titleColor: '#00D9FF',
+                        bodyColor: '#A8B2D1',
+                        borderColor: '#00D9FF',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return [
+                                    context.dataset.label,
+                                    'Income: $' + context.parsed.x.toFixed(1) + 'k',
+                                    'Spending: ' + context.parsed.y.toFixed(1)
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.1)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Spending Score (1-100)',
+                            color: '#00D9FF'
+                        }
+                    },
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 217, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#A8B2D1'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Annual Income (k$)',
+                            color: '#00D9FF'
+                        }
+                    }
+                }
+            }
         });
     </script>
 </body>
